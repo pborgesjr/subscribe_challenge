@@ -32,14 +32,16 @@ const calculateEachItem = (allItems) => {
     }, {total: 0, taxes: 0});
 };
 
-const returnReceipt = (input) => {
+const returnReceipt = (answerFile, answerSystem) => {
+    const breakLineCharacter = answerSystem === 'windows' ? '\r\n' : '\n';
 
-    fs.readFile(`${input}.txt`, 'utf-8', (err, data) => {
+    fs.readFile(`${answerFile}.txt`, 'utf-8', (err, data) => {
+        
         if(err) {
             console.log('Ops, erro ao ler o arquivo..');
             return;
         }
-        const newData = data.split('\r\n').map((item) => {
+        const newData = data.split(breakLineCharacter).map((item) => {
             const amount = item.match(/^\w+/)[0];
             const price = item.match(/[0-9]+.[0-9]+/)[0];
             const name = item.replace(/\sat +[0-9]+.[0-9][0-9]/, '').replace(/^\w+\s/, '');
@@ -65,8 +67,10 @@ const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
   });
-
-rl.question('Choose between: input1, input2 or input3\n', function(answer) {
-    returnReceipt(answer);
-    rl.close();
+ 
+rl.question('Which system are you using? Choose between: mac, linux or windows\n', function(answerSystem) {
+    rl.question( 'Choose between: input1, input2 or input3\n', function(answerFile) {
+        returnReceipt(answerFile, answerSystem);
+        rl.close();
+    })
   });
